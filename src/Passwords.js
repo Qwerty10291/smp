@@ -1,24 +1,22 @@
 import "./Passwords.css"
 import { useEffect, useState } from "react";
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import copy_icon from './copy_icon.png'
-import delete_icon from './delete_icon.png'
-import edit_icon from './edit_icon.png'
-import Modal from "./Modal";
+import { Modal, Stack, Checkbox, Tooltip, TextField, Button, TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, IconButton, Box, Grid, Typography, Slider, FormControlLabel } from "@mui/material";
+import EditIcon from '@mui/icons-material/Edit';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import DeleteIcon from '@mui/icons-material/Delete'
+import RefreshIcon from '@mui/icons-material/Refresh';
 
-const NewPasswordModal = ({ onNew }) => {
+const NewPasswordModal = ({ onCancel, onNew }) => {
     let pswd = { site: "", login: "", comm: "", password: "" };
     let onSave = (pswd) => {
         let date = new Date();
         pswd.date = `${date.getDay()}.${date.getMonth()}.${date.getFullYear()}`
         onNew(pswd)
     }
-    return (<EditPasswordModal pswd={pswd} onSave={onSave}></EditPasswordModal>)
-
+    return (<EditPasswordModal pswd={pswd} onCancel={onCancel} onSave={onSave}></EditPasswordModal>)
 }
 
-const EditPasswordModal = ({ pswd, onSave }) => {
+const EditPasswordModal = ({ pswd, onCancel, onSave }) => {
     const [site, setSite] = useState(pswd.site);
     const [login, setLogin] = useState(pswd.login);
     const [comment, setComment] = useState(pswd.comm);
@@ -43,7 +41,6 @@ const EditPasswordModal = ({ pswd, onSave }) => {
         if (alphabet.length === 0) {
             return ""
         }
-        console.log(alphabet)
         let result = "";
         for (let i = 0; i < genPasswordLen; i++) {
             result += alphabet[Math.floor(alphabet.length * Math.random())]
@@ -62,73 +59,122 @@ const EditPasswordModal = ({ pswd, onSave }) => {
         onSave(pswd)
     };
 
+    const style = {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: 650,
+        bgcolor: 'background.paper',
+        borderRadius: "10px",
+        boxShadow: 24,
+        p: 4,
+    };
+
     return (
-        <div className="password__edit__container">
-            <div className="password__edit__row">
-                <label className="password__edit__row__lbl">Сайт:</label>
-                <input className="inpt-text-full" type="text" value={site} onChange={(e) => setSite(e.target.value)} />
-            </div>
-
-            <div className="password__edit__row">
-                <label className="password__edit__row__lbl">Логин:</label>
-                <input className="inpt-text-full" type="text" value={login} onChange={(e) => setLogin(e.target.value)} />
-            </div>
-
-            <div className="password__edit__row">
-                <label className="password__edit__row__lbl">Комментарий:</label>
-                <input className="inpt-text-full" type="text" value={comment} onChange={(e) => setComment(e.target.value)} />
-            </div>
-
-            <div className="password__edit__row">
-                <label className="password__edit__row__lbl">Пароль:</label>
-                <input className="inpt-text-full" value={password} onChange={(e) => setPassword(e.target.value)} />
-                <button onClick={() => { setPassword(generatePassword()) }}>New</button>
-            </div>
-            <div className="password__edit__row">
-                <input style={{ maxWidth: "50px" }} type="number" min="1" max="99" value={genPasswordLen} onChange={e => { setGenPasswordLen(Number(e.target.value)) }} />
-                <input type="range" min="1" max="99" value={genPasswordLen} onChange={e => { setGenPasswordLen(Number(e.target.value)) }} />
-                <input type="checkbox" checked={genPasswordIncludeDigits} onChange={() => { setGenPasswordIncludeDigits(!genPasswordIncludeDigits) }} />
-                <label>цифры</label>
-                <input type="checkbox" checked={genPasswordIncludeSpecial} onChange={() => { setGenPasswordIncludeSpecial(!genPasswordIncludeSpecial) }} />
-                <label>символы</label>
-                <input type="checkbox" checked={genPasswordIncludeLowercase} onChange={() => { setGenPasswordIncludeLowercase(!genPasswordIncludeLowercase) }} />
-                <label>A-B</label>
-                <input type="checkbox" checked={genPasswordIncludeUppercase} onChange={() => { setGenPasswordIncludeUppercase(!genPasswordIncludeUppercase) }} />
-                <label>a-b</label>
-            </div>
-            <button onClick={handleSave}>Сохранить</button>
-        </div>
+        <Box sx={style}>
+            <Grid container spacing={2}>
+                <Grid item xs={3} sx={{ alignSelf: "center" }}>
+                    <Typography>Сайт:</Typography>
+                </Grid>
+                <Grid item xs={9}>
+                    <TextField variant="filled" label="site" sx={{ width: "100%" }} value={site} onChange={(e) => setSite(e.target.value)} />
+                </Grid>
+                <Grid item xs={3} sx={{ alignSelf: "center" }}>
+                    <Typography>Логин:</Typography>
+                </Grid>
+                <Grid item xs={9}>
+                    <TextField variant="filled" label="login" sx={{ width: "100%" }} value={login} onChange={(e) => setLogin(e.target.value)} />
+                </Grid>
+                <Grid item xs={3} sx={{ alignSelf: "center" }}>
+                    <Typography>Комментарий:</Typography>
+                </Grid>
+                <Grid item xs={9}>
+                    <TextField variant="filled" label="commentary" sx={{ width: "100%" }} value={comment} onChange={(e) => setComment(e.target.value)} />
+                </Grid>
+                <Grid item xs={3} sx={{ alignSelf: "center" }}>
+                    <Typography>Пароль:</Typography>
+                </Grid>
+                <Grid item xs={9}>
+                    <Stack xs={{ alignItems: "center" }} direction="row" spacing={2}>
+                        <TextField variant="filled" label="password" sx={{ width: "100%" }} value={password} onChange={(e) => setPassword(e.target.value)} />
+                        <Tooltip title="generate">
+                            <IconButton onClick={() => { setPassword(generatePassword()) }} aria-label="generate">
+                                <RefreshIcon />
+                            </IconButton>
+                        </Tooltip>
+                        <Tooltip title="copy">
+                            <IconButton onClick={() => { navigator.clipboard.writeText(password) }} aria-label="generate">
+                                <ContentCopyIcon />
+                            </IconButton>
+                        </Tooltip>
+                    </Stack>
+                </Grid>
+                <Grid item xs={12}>
+                    <Stack sx={{ alignItems: "center" }} direction="row" spacing={1}>
+                        <TextField sx={{ maxWidth: "100px" }} type="number" min="1" max="99" value={genPasswordLen} onChange={e => { setGenPasswordLen(Number(e.target.value)) }} />
+                        <Slider sx={{ maxWidth: "100px" }} min={1} max={99} value={genPasswordLen} onChange={e => { setGenPasswordLen(Number(e.target.value)) }} />
+                        <FormControlLabel control={<Checkbox checked={genPasswordIncludeDigits} onChange={() => { setGenPasswordIncludeDigits(!genPasswordIncludeDigits) }} />} label="цифры" />
+                        <FormControlLabel control={<Checkbox checked={genPasswordIncludeSpecial} onChange={() => { setGenPasswordIncludeSpecial(!genPasswordIncludeSpecial) }} />} label="символы" />
+                        <FormControlLabel control={<Checkbox checked={genPasswordIncludeLowercase} onChange={() => { setGenPasswordIncludeLowercase(!genPasswordIncludeLowercase) }} />} label="a-b" />
+                        <FormControlLabel control={<Checkbox checked={genPasswordIncludeUppercase} onChange={() => { setGenPasswordIncludeUppercase(!genPasswordIncludeUppercase) }} />} label="A-B" />
+                    </Stack>
+                </Grid>
+                <Grid item xs={2}>
+                    <Button size="large" color="error" variant="contained" onClick={onCancel}>Отмена</Button>
+                </Grid>
+                <Grid item xs={7} />
+                <Grid item xs={2}>
+                    <Button size="large" color="success" variant="contained" onClick={handleSave} >Сохранить</Button>
+                </Grid>
+            </Grid>
+        </Box>
     );
 }
 
-const PasswordItem = ({ pswd, deletePswd, changePassword }) => {
+const PasswordItem = ({ row, onUpdate, onDelete }) => {
     const copy = () => {
-        navigator.clipboard.writeText(pswd.password)
-        toast('Пароль скопирован!');
+        navigator.clipboard.writeText(row.password)
     }
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const openModal = () => {
-        setIsModalOpen(true);
-    };
+        setIsModalOpen(true)
+    }
 
     const closeModal = () => {
-        setIsModalOpen(false);
-    };
-    return (
-        <div className="passwords__item">
-            <Modal isOpen={isModalOpen} onClose={closeModal}>
-                <EditPasswordModal pswd={pswd} onSave={() => { changePassword(pswd); closeModal() }}></EditPasswordModal>
-            </Modal>
-            <span>{pswd.site}</span>
-            <span>{pswd.login}</span>
-            <span className="password__item__comm">{pswd.comm.length < 50 ? pswd.comm : pswd.comm.slice(0, 47) + "..."}</span>
-            <span>{pswd.date}</span>
-            <button onClick={copy} className="btn-password-item btn-password-copy"><img src={copy_icon}></img></button>
-            <button onClick={openModal} className="btn-password-item" ><img src={edit_icon}></img></button>
-            <button onClick={() => { deletePswd(pswd) }} className="btn-password-item" ><img src={delete_icon}></img></button>
-        </div>
-    )
+        setIsModalOpen(false)
+    }
+
+    return (<TableRow
+        key={row.site + row.login}
+        sx={{ '&:last-child td, &:last-child th': { border: "0" } }}
+    >
+        <Modal open={isModalOpen} onClose={closeModal}>
+            <EditPasswordModal pswd={row} onCancel={closeModal} onSave={(pswd) => { closeModal(); onUpdate(pswd); }} />
+        </Modal>
+        <TableCell>{row.date}</TableCell>
+        <TableCell>{row.site}</TableCell>
+        <TableCell>{row.comm}</TableCell>
+        <TableCell align="right">
+            <Tooltip title="copy">
+                <IconButton onClick={copy} aria-label="copy">
+                    <ContentCopyIcon />
+                </IconButton>
+            </Tooltip>
+            <Tooltip title="edit">
+                <IconButton onClick={openModal} aria-label="edit">
+                    <EditIcon />
+                </IconButton>
+            </Tooltip>
+            <Tooltip title="delete">
+                <IconButton onClick={() => onDelete(row)} aria-label="delete" sx={{ color: "red" }}>
+                    <DeleteIcon />
+                </IconButton>
+            </Tooltip>
+
+        </TableCell>
+    </TableRow>);
 }
 
 
@@ -141,7 +187,7 @@ function Passwords() {
         localStorage.setItem('passwords', JSON.stringify(passwords))
     }, [passwords])
 
-    const [nameFilter, setNameFilter] = useState("")
+    const [siteFilter, setSiteFilter] = useState("")
     const [loginFilter, setLoginFilter] = useState("")
     const [passwordFilter, setPasswordFilter] = useState("")
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -160,7 +206,9 @@ function Passwords() {
     }
 
     const deletePassword = (pswd) => {
-        setPasswords(passwords.filter(oldPswd => oldPswd !== pswd))
+        if (window.confirm("Вы уверены что хотите удалить данный пароль?")) {
+            setPasswords(passwords.filter(oldPswd => oldPswd !== pswd))
+        }
     }
 
     const changePassword = (pswd) => {
@@ -171,31 +219,49 @@ function Passwords() {
     }
 
     const passwordsFilter = (pswd) => {
-        return (nameFilter.length > 0 ? pswd.site.toLowerCase().includes(nameFilter.toLowerCase()) : true) &&
+        return (siteFilter.length > 0 ? pswd.site.toLowerCase().includes(siteFilter.toLowerCase()) : true) &&
             (loginFilter.length > 0 ? pswd.login.toLowerCase().includes(loginFilter.toLowerCase()) : true) &&
             (passwordFilter.length > 0 ? pswd.password === passwordFilter : true)
     }
 
     return (
-        <div id="passwords__container">
-            <Modal isOpen={isModalOpen} onClose={closeModal}>
-                <NewPasswordModal onNew={newPassword} />
+        <div>
+            <Modal open={isModalOpen} onClose={closeModal}>
+                <NewPasswordModal onNew={newPassword} onCancel={closeModal} />
             </Modal>
-            <div className="passwords__filters">
-                <input value={nameFilter} placeholder="site" className="inpt passwords__filter" onChange={e => setNameFilter(e.target.value)} />
-                <input value={loginFilter} placeholder="login" className="inpt passwords__filter" onChange={e => setLoginFilter(e.target.value)} />
-                <input value={passwordFilter} placeholder="password" className="inpt passwords__filter" onChange={e => setPasswordFilter(e.target.value)} />
-                <button className="btn passwords__add" onClick={openModal}>NEW PASSWORD</button>
-            </div>
-
-            <div className="passswords__items">
-                {passwords
-                    .filter(passwordsFilter)
-                    .map(pswd =>
-                        <PasswordItem pswd={pswd} deletePswd={deletePassword} changePassword={changePassword} key={pswd.site + pswd.date + pswd.login} />)
-                }
-            </div>
+            <Stack spacing={4}>
+                <Stack direction="row" spacing={2}>
+                    <TextField value={siteFilter} onChange={e => setSiteFilter(e.target.value)} variant="filled" label="site" />
+                    <TextField value={loginFilter} onChange={e => setLoginFilter(e.target.value)} variant="filled" label="login" />
+                    <TextField value={passwordFilter} onChange={e => setPasswordFilter(e.target.value)} variant="filled" label="password" type="password" />
+                    <Button variant="contained" sx={{ marginLeft: "auto !important" }} onClick={openModal}>New</Button>
+                </Stack>
+                <TableContainer component={Paper}>
+                    <Table sx={{ width: "100%" }} aria-label="passwords">
+                        <colgroup>
+                            <col width="5%" />
+                            <col width="15%" />
+                            <col width="60%" />
+                            <col width="10%" />
+                        </colgroup>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>Date</TableCell>
+                                <TableCell>Site</TableCell>
+                                <TableCell>Commentary</TableCell>
+                                <TableCell></TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {passwords.filter(passwordsFilter).map((row) =>
+                                <PasswordItem row={row} onUpdate={changePassword} onDelete={deletePassword} />
+                            )}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            </Stack>
         </div>
+
     )
 }
 
