@@ -229,36 +229,39 @@ function Passwords() {
             <Modal open={isModalOpen} onClose={closeModal}>
                 <NewPasswordModal onNew={newPassword} onCancel={closeModal} />
             </Modal>
-            <Stack spacing={4}>
+            <Stack sx={{height: "100%"}} spacing={4}>
                 <Stack direction="row" spacing={2}>
                     <TextField value={siteFilter} onChange={e => setSiteFilter(e.target.value)} variant="filled" label="site" />
                     <TextField value={loginFilter} onChange={e => setLoginFilter(e.target.value)} variant="filled" label="login" />
                     <TextField value={passwordFilter} onChange={e => setPasswordFilter(e.target.value)} variant="filled" label="password" type="password" />
-                    <Button variant="contained" sx={{ marginLeft: "auto !important" }} onClick={openModal}>New</Button>
+                    <Button variant="contained" sx={{ marginLeft: "auto !important" }} onClick={openModal}>Новый</Button>
                 </Stack>
-                <TableContainer component={Paper}>
-                    <Table sx={{ width: "100%" }} aria-label="passwords">
-                        <colgroup>
-                            <col width="5%" />
-                            <col width="15%" />
-                            <col width="60%" />
-                            <col width="10%" />
-                        </colgroup>
-                        <TableHead>
-                            <TableRow>
-                                <TableCell>Date</TableCell>
-                                <TableCell>Site</TableCell>
-                                <TableCell>Commentary</TableCell>
-                                <TableCell></TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {passwords.filter(passwordsFilter).map((row) =>
-                                <PasswordItem row={row} onUpdate={changePassword} onDelete={deletePassword} />
-                            )}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
+                <Paper sx={{ width: "100%" }}>
+                    <TableContainer sx={{maxHeight: "75vh"}}>
+                        <Table stickyHeader aria-label="passwords">
+                            <colgroup>
+                                <col width="5%" />
+                                <col width="15%" />
+                                <col width="60%" />
+                                <col width="10%" />
+                            </colgroup>
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>Дата</TableCell>
+                                    <TableCell>Сайт</TableCell>
+                                    <TableCell>Комментарий</TableCell>
+                                    <TableCell align="center">Действия</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {passwords.filter(passwordsFilter).map((row) =>
+                                    <PasswordItem row={row} onUpdate={changePassword} onDelete={deletePassword} />
+                                )}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                </Paper>
+
             </Stack>
         </div>
 
